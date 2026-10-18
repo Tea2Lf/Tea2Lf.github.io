@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tea2Lf · Toolbox</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; min-height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'JetBrains Mono','Fira Code','Consolas',monospace; padding: 24px; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 20px; padding: 40px 44px 36px; max-width: 880px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        .header { text-align: center; border-bottom: 1px solid #21262d; padding-bottom: 18px; margin-bottom: 22px; }
+        .title { font-size: 38px; font-weight: 700; color: #f0f6fc; letter-spacing: 1px; }
+        .subtitle { font-size: 17px; color: #8b949e; margin-top: 2px; letter-spacing: 0.5px; }
+        .info-block { background: #0d1117; border: 1px solid #21262d; border-radius: 14px; padding: 12px 20px; margin-bottom: 24px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 6px 20px; }
+        .info-item { color: #b1bac4; font-size: 16px; }
+        .info-item .value { color: #f0f6fc; font-weight: 600; }
+        .info-item .prime-badge { display: inline-block; padding: 0 12px; border-radius: 30px; font-size: 14px; font-weight: 600; margin-left: 6px; }
+        .prime-badge.prime { color: #7ee787; border: 1px solid #2ea043; background: #1f6f3a; }
+        .prime-badge.composite { color: #ffa28b; border: 1px solid #da3633; background: #6b2a2a; }
+        .info-item .factor { color: #79c0ff; font-weight: 500; }
+
+        .tool-list { display: flex; flex-direction: column; gap: 16px; }
+        .tool-card { background: #0d1117; border: 1px solid #30363d; border-radius: 14px; padding: 16px 20px 18px; transition: border-color 0.25s; }
+        .tool-card:hover { border-color: #58a6ff; }
+        .tool-card .head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+        .tool-card .name { color: #f0f6fc; font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
+        .tool-card .desc { color: #8b949e; font-size: 13px; letter-spacing: 0.3px; }
+        .tool-card .body { display: flex; flex-direction: column; gap: 8px; }
+        .tool-card .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+        .tool-card .row label { color: #b1bac4; font-size: 14px; min-width: 36px; }
+        .tool-card select, .tool-card input { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 14px; padding: 6px 10px; outline: none; flex: 1; min-width: 60px; }
+        .tool-card select:focus, .tool-card input:focus { border-color: #58a6ff; }
+        .tool-card select option { background: #161b22; }
+        .tool-card .input-group { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+        .tool-card .input-group input { flex: 1; min-width: 50px; }
+        .tool-card .output { background: #0d1117; border: 1px solid #21262d; border-radius: 6px; padding: 8px 12px; color: #79c0ff; font-size: 15px; min-height: 32px; word-break: break-all; }
+        .tool-card .output .lbl { color: #8b949e; font-size: 13px; }
+        .tool-card .output .res { color: #f0f6fc; font-weight: 600; }
+        .btn { background: #1f6f3a; border: 1px solid #2ea043; color: #f0f6fc; font-family: inherit; font-size: 14px; font-weight: 600; padding: 6px 18px; border-radius: 30px; cursor: pointer; transition: all 0.2s; }
+        .btn:hover { background: #2ea043; transform: scale(1.02); }
+        .btn:active { transform: scale(0.97); }
+
+        .factor-result .prime-part { color: #79c0ff; font-size: 18px; font-weight: 500; }
+        .factor-result .error-text { color: #ffa28b; font-size: 16px; }
+        .factor-result .strong-text { color: #ff4444; font-size: 20px; font-weight: 700; animation: strongPulse 0.4s ease-in-out infinite alternate; }
+        @keyframes strongPulse { 0% { opacity: 0.6; transform: scale(0.96); } 100% { opacity: 1; transform: scale(1.04); } }
+
+        .collatz-chain { max-height: 80px; overflow-y: auto; font-size: 14px; color: #b1bac4; line-height: 1.6; word-break: break-all; scrollbar-width: thin; scrollbar-color: #30363d transparent; }
+        .collatz-chain::-webkit-scrollbar { width: 4px; }
+        .collatz-chain::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        .collatz-chain .highlight { color: #79c0ff; font-weight: 500; }
+        .collatz-chain .arr { color: #484f58; }
+
+        .chart-wrap { margin-top: 6px; background: #0d1117; border: 1px solid #21262d; border-radius: 8px; padding: 8px; }
+        .chart-wrap canvas { display: block; width: 100%; height: auto; border-radius: 4px; }
+
+        .nuke-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a0000; display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; animation: nukeFlash 0.5s ease 3; }
+        .nuke-overlay.active { display: flex; }
+        .nuke-text { color: #ff3333; font-size: 44px; font-weight: 700; text-align: center; line-height: 1.4; text-shadow: 0 0 40px #ff000066; animation: nukePulse 0.6s ease-in-out infinite alternate; }
+        .nuke-sub { color: #cc6666; font-size: 18px; margin-top: 14px; letter-spacing: 4px; }
+        .nuke-dismiss { margin-top: 36px; background: transparent; border: 1px solid #ff3333; color: #ff6666; font-family: inherit; font-size: 15px; padding: 8px 28px; border-radius: 30px; cursor: pointer; transition: all 0.3s; }
+        .nuke-dismiss:hover { background: #ff3333; color: #1a0000; }
+        @keyframes nukeFlash { 0%,100% { background: #1a0000; } 50% { background: #330000; } }
+        @keyframes nukePulse { 0% { opacity: 0.7; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1.02); } }
+
+        @media (max-width:620px) {
+            .card { padding: 16px 12px 14px; }
+            .title { font-size: 26px; }
+            .subtitle { font-size: 14px; }
+            .info-block { padding: 8px 12px; gap: 4px 10px; font-size: 13px; }
+            .tool-card { padding: 12px 14px 14px; }
+            .tool-card .name { font-size: 17px; }
+            .nuke-text { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="nuke-overlay" id="nukeOverlay">
+    <div class="nuke-text" id="nukeText">!!! NUCLEAR LAUNCH DETECTED !!!</div>
+    <div class="nuke-sub" id="nukeSub">INVALID INPUT</div>
+    <button class="nuke-dismiss" id="nukeDismiss">abort</button>
+</div>
+
+<div class="card">
+    <div class="header"><div class="title">Hello, I'm Tea2Lf.</div><div class="subtitle">What can I help you?</div></div>
+
+    <div class="info-block">
+        <span class="info-item">DATE: <span class="value" id="dateDisplay">20260810</span></span>
+        <span class="info-item" id="primeDisplay">STATUS: <span class="prime-badge" style="background:#30363d;color:#8b949e;border-color:#30363d;">...</span></span>
+        <span class="info-item">FACTOR: <span class="factor" id="factorDisplay">---</span></span>
+    </div>
+
+    <div class="tool-list">
+
+        <!-- ===== CALC ===== -->
+        <div class="tool-card">
+            <div class="head"><span class="name">Calc</span><span class="desc">brain helper</span></div>
+            <div class="body">
+                <div class="row">
+                    <label>fn</label>
+                    <select id="funcSelect">
+                        <option value="gcd">gcd</option><option value="lcm">lcm</option>
+                        <option value="exgcd">exgcd</option><option value="inv">inv</option>
+                        <option value="phi">phi</option><option value="tau">tau</option>
+                        <option value="sigma">sigma</option><option value="pi">pi</option>
+                        <option value="mod">mod</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <label>in</label>
+                    <div class="input-group" id="inputGroup"></div>
+                </div>
+                <div class="row">
+                    <label>out</label>
+                    <span style="color:#484f58;font-size:13px;" id="outputLabel">(auto)</span>
+                </div>
+                <div class="output" id="outputDisplay"><span class="lbl">result: </span><span class="res" id="resultValue">--</span></div>
+                <div style="text-align:right;margin-top:2px;"><button class="btn" id="calcRunBtn">run</button></div>
+            </div>
+        </div>
+
+        <!-- ===== FACTOR ===== -->
+        <div class="tool-card">
+            <div class="head"><span class="name">Factor</span><span class="desc">prime factorization</span></div>
+            <div class="body">
+                <div class="row"><label>n</label><input type="text" id="factorInput" placeholder="integer >= 2" style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#f0f6fc;font-family:inherit;font-size:14px;padding:6px 10px;outline:none;min-width:60px;"></div>
+                <div class="output factor-result" id="factorResult"><span style="color:#484f58;">--</span></div>
+                <div style="text-align:right;margin-top:2px;"><button class="btn" id="factorRunBtn">factor</button></div>
+            </div>
+        </div>
+
+        <!-- ===== 421 ===== -->
+        <div class="tool-card">
+            <div class="head"><span class="name">421</span><span class="desc">Collatz (3x+1)</span></div>
+            <div class="body">
+                <div class="row"><label>n</label><input type="text" id="collatzInput" placeholder="positive integer" style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#f0f6fc;font-family:inherit;font-size:14px;padding:6px 10px;outline:none;min-width:60px;"></div>
+                <div class="row" style="gap:4px 16px;">
+                    <span style="color:#8b949e;font-size:13px;">steps: <span style="color:#f0f6fc;font-weight:600;" id="collatzSteps">--</span></span>
+                    <span style="color:#8b949e;font-size:13px;">max: <span style="color:#79c0ff;font-weight:600;" id="collatzMax">--</span></span>
+                </div>
+                <div class="collatz-chain" id="collatzChain"><span style="color:#484f58;">--</span></div>
+                <div class="chart-wrap"><canvas id="collatzChart" width="800" height="200"></canvas></div>
+                <div style="text-align:right;margin-top:2px;"><button class="btn" id="collatzRunBtn">run</button></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+// ----- DOM refs -----
+const O=document.getElementById('nukeOverlay'), NT=document.getElementById('nukeText'), NS=document.getElementById('nukeSub'), ND=document.getElementById('nukeDismiss');
+const FS=document.getElementById('funcSelect'), IG=document.getElementById('inputGroup'), OL=document.getElementById('outputLabel'), RV=document.getElementById('resultValue'), CR=document.getElementById('calcRunBtn');
+const FI=document.getElementById('factorInput'), FR=document.getElementById('factorResult'), FRun=document.getElementById('factorRunBtn');
+const CI=document.getElementById('collatzInput'), CS=document.getElementById('collatzSteps'), CM=document.getElementById('collatzMax'), CC=document.getElementById('collatzChain'), CV=document.getElementById('collatzChart'), CRun=document.getElementById('collatzRunBtn');
+
+// ----- nuke -----
+let nukeActive=false, nukeTimer=null;
+function nuke(msg,sub){ if(nukeActive)return; nukeActive=true; if(msg)NT.textContent=msg; if(sub)NS.textContent=sub; O.classList.add('active'); clearTimeout(nukeTimer); nukeTimer=setTimeout(dismissNuke,6000); }
+function dismissNuke(){ nukeActive=false; O.classList.remove('active'); clearTimeout(nukeTimer); }
+ND.addEventListener('click',dismissNuke);
+
+// ----- math -----
+function gcd(a,b){ a=Math.abs(a);b=Math.abs(b); while(b){let t=a%b;a=b;b=t;} return a; }
+function lcm(a,b){ if(a===0||b===0)return 0; return Math.abs(a)/gcd(a,b)*Math.abs(b); }
+function exgcd(a,b){ if(b===0)return {g:Math.abs(a),x:a<0?-1:1,y:0}; let r=exgcd(b,a%b); return {g:r.g,x:r.y,y:r.x-Math.floor(a/b)*r.y}; }
+function modInv(a,m){ a=((a%m)+m)%m; let r=exgcd(a,m); if(r.g!==1)return null; return ((r.x%m)+m)%m; }
+function phi(n){ if(n<1)return 0; let num=n,res=n; if(num%2===0){while(num%2===0)num/=2;res-=res/2;} for(let p=3;p*p<=num;p+=2){if(num%p===0){while(num%p===0)num/=p;res-=res/p;}} if(num>1)res-=res/num; return res; }
+function tau(n){ if(n<1)return 0; let num=n,c,total=1; c=0;while(num%2===0){c++;num/=2;}if(c)total*=c+1; for(let p=3;p*p<=num;p+=2){c=0;while(num%p===0){c++;num/=p;}if(c)total*=c+1;} if(num>1)total*=2; return total; }
+function sigma(n){ if(n<1)return 0; let num=n,sum=1,c; c=0;while(num%2===0){c++;num/=2;}if(c)sum*=(Math.pow(2,c+1)-1); for(let q=3;q*q<=num;q+=2){c=0;while(num%q===0){c++;num/=q;}if(c)sum*=(Math.pow(q,c+1)-1)/(q-1);} if(num>1)sum*=(num*num-1)/(num-1); return sum; }
+function pi(n){ if(n<2)return 0; let cnt=0, a=new Uint8Array(n+1); for(let i=2;i<=n;i++)a[i]=1; for(let i=2;i*i<=n;i++)if(a[i])for(let j=i*i;j<=n;j+=i)a[j]=0; for(let i=2;i<=n;i++)if(a[i])cnt++; return cnt; }
+function modFn(a,m){ if(m===0)return null; return ((a%m)+m)%m; }
+
+// ----- factorize BigInt -----
+function factorizeBigInt(n){ if(n<2n)return[]; let num=n, factors=[], c=0n; while(num%2n===0n){c++;num/=2n;} if(c)factors.push({p:2n,e:c}); for(let p=3n;p*p<=num;p+=2n){c=0n; while(num%p===0n){c++;num/=p;} if(c)factors.push({p:p,e:c});} if(num>1n)factors.push({p:num,e:1n}); return factors; }
+function factorString(f){ if(!f||!f.length)return '(none)'; return f.map(x=>x.e===1n?String(x.p):String(x.p)+'^'+String(x.e)).join(' * '); }
+
+// ===== CALC =====
+const funcDefs={
+ gcd:{i:2,lbl:['a','b'],ol:['gcd'], c:function(a){ let x=parseInt(a[0])||0,y=parseInt(a[1])||0; return [gcd(x,y)]; }},
+ lcm:{i:2,lbl:['a','b'],ol:['lcm'], c:function(a){ let x=parseInt(a[0])||0,y=parseInt(a[1])||0; return [lcm(x,y)]; }},
+ exgcd:{i:2,lbl:['a','b'],ol:['g','x','y'], c:function(a){ let x=parseInt(a[0])||0,y=parseInt(a[1])||0; let r=exgcd(x,y); return [r.g,r.x,r.y]; }},
+ inv:{i:2,lbl:['a','m'],ol:['inv'], c:function(a){ let x=parseInt(a[0])||0,m=parseInt(a[1])||1; let r=modInv(x,m); return r===null?['(no inverse)']:[r]; }},
+ phi:{i:1,lbl:['n'],ol:['phi(n)'], c:function(a){ let n=parseInt(a[0])||0; return [phi(n)]; }},
+ tau:{i:1,lbl:['n'],ol:['tau(n)'], c:function(a){ let n=parseInt(a[0])||0; return [tau(n)]; }},
+ sigma:{i:1,lbl:['n'],ol:['sigma(n)'], c:function(a){ let n=parseInt(a[0])||0; return [sigma(n)]; }},
+ pi:{i:1,lbl:['n'],ol:['pi(n)'], c:function(a){ let n=parseInt(a[0])||0; return [pi(n)]; }},
+ mod:{i:2,lbl:['a','m'],ol:['a mod m'], c:function(a){ let x=parseInt(a[0])||0,m=parseInt(a[1])||0; return m===0?['(mod 0 undefined)']:[modFn(x,m)]; }}
+};
+
+function renderInputs(){
+ const key=FS.value, def=funcDefs[key]; if(!def)return;
+ IG.innerHTML=''; for(let i=0;i<def.i;i++){ let inp=document.createElement('input'); inp.type='text'; inp.placeholder=def.lbl[i]||('arg'+(i+1)); inp.className='calc-input'; IG.appendChild(inp); }
+ OL.textContent=def.ol.length===1?def.ol[0]:def.ol.join(' , ');
+ RV.textContent='--';
+}
+
+function runCalc(){
+ const key=FS.value, def=funcDefs[key]; if(!def)return;
+ const args=[]; IG.querySelectorAll('.calc-input').forEach(inp=>args.push(inp.value.trim()||'0'));
+ let res; try{ res=def.c(args); }catch(e){ RV.textContent='(error)'; return; }
+ RV.textContent=res.length===1?String(res[0]):res.map(String).join(' , ');
+}
+
+FS.addEventListener('change',renderInputs);
+CR.addEventListener('click',runCalc);
+
+// ===== FACTOR =====
+function runFactor(){
+ const raw=FI.value.trim(); if(raw===''){ FR.innerHTML='<span style="color:#484f58;">--</span>'; return; }
+ let n; try{ n=BigInt(raw); }catch(e){ nuke('!!! NUCLEAR LAUNCH DETECTED !!!','INVALID INPUT'); FR.innerHTML='<span class="error-text">invalid input</span>'; return; }
+ if(n<2n){ nuke('!!! NUCLEAR LAUNCH DETECTED !!!','INPUT < 2'); FR.innerHTML='<span class="error-text">n >= 2</span>'; return; }
+ const start=Date.now(); let done=false;
+ function doFactor(){
+  try{
+   const factors=factorizeBigInt(n);
+   if(Date.now()-start>60000){ nuke('your number is so strong!','TIME OUT'); FR.innerHTML='<span class="strong-text">your number is so strong!</span>'; done=true; return; }
+   if(!factors||!factors.length){ FR.innerHTML='<span class="error-text">(error)</span>'; done=true; return; }
+   const fs=factorString(factors);
+   const isPrime=(factors.length===1 && factors[0].e===1n && factors[0].p===n);
+   const tag=isPrime?' <span style="color:#7ee787;font-size:14px;">[prime]</span>':'';
+   FR.innerHTML='<span class="prime-part">'+fs+'</span>'+tag+'<span style="color:#484f58;font-size:13px;margin-left:6px;"> = '+String(n)+'</span>';
+   done=true;
+  }catch(e){ FR.innerHTML='<span class="error-text">(error)</span>'; done=true; }
+ }
+ if(n<1000000000000000n){ doFactor(); }else{ function chunk(){ if(done)return; if(Date.now()-start>60000){ nuke('your number is so strong!','TIME OUT'); FR.innerHTML='<span class="strong-text">your number is so strong!</span>'; done=true; return; } doFactor(); if(!done)setTimeout(chunk,50); } chunk(); }
+}
+FRun.addEventListener('click',runFactor);
+
+// ===== 421 (Collatz) with chart =====
+let lastCollatzData=[];
+
+function drawChart(data){
+ const canvas=CV, rect=canvas.parentElement.getBoundingClientRect();
+ const dpr=window.devicePixelRatio||1;
+ const w=Math.min(rect.width||800,800), h=200;
+ canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px';
+ const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+ const pad={top:16,bottom:20,left:32,right:12};
+ const innerW=w-pad.left-pad.right, innerH=h-pad.top-pad.bottom;
+ ctx.clearRect(0,0,w,h);
+
+ if(!data||data.length<2){ ctx.fillStyle='#484f58'; ctx.font='14px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('no data',w/2,h/2+5); return; }
+
+ const maxVal=Math.max(...data);
+ const logMax=Math.log10(maxVal+1);
+ if(logMax===0){ ctx.fillStyle='#484f58'; ctx.font='14px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('constant',w/2,h/2+5); return; }
+
+ // axes
+ ctx.strokeStyle='#30363d'; ctx.lineWidth=1;
+ ctx.beginPath(); ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+innerH); ctx.lineTo(pad.left+innerW,pad.top+innerH); ctx.stroke();
+
+ // y labels
+ ctx.fillStyle='#484f58'; ctx.font='10px monospace'; ctx.textAlign='right'; ctx.textBaseline='middle';
+ for(let i=0;i<=4;i++){
+  const val=Math.pow(10,i);
+  if(val>maxVal*10)break;
+  const y=pad.top+innerH - (i/4)*innerH;
+  ctx.fillText('10^'+i,pad.left-4,y);
+  ctx.strokeStyle='#21262d'; ctx.lineWidth=0.5; ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+innerW,y); ctx.stroke();
+ }
+
+ // x labels
+ ctx.fillStyle='#484f58'; ctx.font='10px monospace'; ctx.textAlign='center'; ctx.textBaseline='top';
+ const step=Math.max(1,Math.floor(data.length/8));
+ for(let i=0;i<data.length;i+=step){
+  const x=pad.left+(i/(data.length-1))*innerW;
+  ctx.fillText(i,x,pad.top+innerH+4);
+ }
+
+ // plot
+ ctx.strokeStyle='#79c0ff'; ctx.lineWidth=1.5;
+ ctx.beginPath();
+ for(let i=0;i<data.length;i++){
+  const x=pad.left+(i/(data.length-1))*innerW;
+  const logVal=Math.log10(data[i]+1);
+  const y=pad.top+innerH - (logVal/logMax)*innerH;
+  if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y);
+ }
+ ctx.stroke();
+
+ // end point
+ if(data.length>0){
+  const last=data[data.length-1];
+  const x=pad.left+innerW;
+  const logVal=Math.log10(last+1);
+  const y=pad.top+innerH - (logVal/logMax)*innerH;
+  ctx.fillStyle='#7ee787'; ctx.beginPath(); ctx.arc(x,y,3,0,2*Math.PI); ctx.fill();
+ }
+}
+
+function runCollatz(){
+ const raw=CI.value.trim();
+ if(raw===''){ CS.textContent='--'; CM.textContent='--'; CC.innerHTML='<span style="color:#484f58;">--</span>'; drawChart([]); lastCollatzData=[]; return; }
+ let n; try{ n=BigInt(raw); }catch(e){ nuke('!!! NUCLEAR LAUNCH DETECTED !!!','INVALID INPUT'); CS.textContent='(error)'; CM.textContent='--'; CC.innerHTML=''; drawChart([]); lastCollatzData=[]; return; }
+ if(n<1n){ nuke('!!! NUCLEAR LAUNCH DETECTED !!!','INPUT < 1'); CS.textContent='(error)'; CM.textContent='--'; CC.innerHTML=''; drawChart([]); lastCollatzData=[]; return; }
+
+ const parts=[Number(n)]; let x=n, k=0, maxVal=Number(n);
+ const maxSteps=100000;
+ while(x!==1n && k<maxSteps){
+  if(x%2n===1n){ x=3n*x+1n; }else{ x/=2n; }
+  k++;
+  const v=Number(x);
+  parts.push(v);
+  if(v>maxVal)maxVal=v;
+ }
+ lastCollatzData=parts;
+
+ if(k>=maxSteps){ CS.textContent='>'+maxSteps+' (abort)'; CM.textContent=maxVal; CC.innerHTML='<span style="color:#ffa28b;">too many steps</span>'; drawChart(parts); return; }
+
+ CS.textContent=k; CM.textContent=maxVal;
+ let display;
+ if(parts.length<=60){
+  display=parts.map((v,i)=>i===parts.length-1?'<span class="highlight">'+v+'</span>':v+' <span class="arr">→</span> ').join('');
+ }else{
+  const head=parts.slice(0,20).map(v=>String(v)+' → ').join('');
+  const tail=' ... → '+parts.slice(-10).map((v,i)=>i===9?'<span class="highlight">'+v+'</span>':v+' → ').join('');
+  display=head+tail;
+ }
+ CC.innerHTML=display;
+ drawChart(parts);
+}
+CRun.addEventListener('click',runCollatz);
+
+// ===== Enter key =====
+document.addEventListener('keydown',function(e){
+ if(e.key!=='Enter')return;
+ if(e.target===FS || e.target.closest('.calc-input')){ e.preventDefault(); runCalc(); }
+ else if(e.target===FI){ e.preventDefault(); runFactor(); }
+ else if(e.target===CI){ e.preventDefault(); runCollatz(); }
+});
+
+// ===== Resize chart =====
+let resizeTimer;
+window.addEventListener('resize',function(){
+ clearTimeout(resizeTimer);
+ resizeTimer=setTimeout(function(){ if(lastCollatzData.length)drawChart(lastCollatzData); },300);
+});
+
+// ===== Date info =====
+function updateInfo(){
+ const now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,'0'), d=String(now.getDate()).padStart(2,'0');
+ const ds=y+m+d, num=parseInt(ds,10);
+ document.getElementById('dateDisplay').textContent=ds;
+ const pe=document.getElementById('primeDisplay'), badge=pe.querySelector('.prime-badge');
+ function isPrime(n){ if(n<2)return false; if(n===2)return true; if(n%2===0)return false; for(let i=3;i*i<=n;i+=2)if(n%i===0)return false; return true; }
+ function fac(n){ if(n<2)return[]; let num=n,f=[],c; c=0;while(num%2===0){c++;num/=2;}if(c)f.push({p:2,e:c}); for(let p=3;p*p<=num;p+=2){c=0;while(num%p===0){c++;num/=p;}if(c)f.push({p:p,e:c});} if(num>1)f.push({p:num,e:1}); return f; }
+ const isP=isPrime(num), factors=fac(num);
+ if(isP){ badge.textContent='PRIME'; badge.className='prime-badge prime'; }
+ else if(num<2){ badge.textContent='NEITHER'; badge.className='prime-badge'; badge.style.cssText='color:#8b949e;border-color:#30363d;background:#0d1117;'; }
+ else { badge.textContent='COMPOSITE'; badge.className='prime-badge composite'; }
+ const fe=document.getElementById('factorDisplay');
+ if(num<2||!factors.length){ fe.textContent='--'; }
+ else { fe.textContent=factors.map(f=>f.e===1?f.p:f.p+'^'+f.e).join(' * '); }
+}
+
+// ===== Init =====
+updateInfo();
+renderInputs();
+})();
+</script>
+</body>
+</html>
