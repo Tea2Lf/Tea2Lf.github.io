@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tea2Lf</title>
+<title>Tea2Lf · 夜间主题</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;700&display=swap" rel="stylesheet">
@@ -12,11 +12,18 @@
 body {
   background:#0b0e14; min-height:100vh; display:flex; align-items:flex-start; justify-content:flex-start;
   font-family:'Saira','Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
-  padding:2.5rem 1.5rem; position:relative;
-  background-image:radial-gradient(circle at 30% 40%,rgba(70,130,200,.03) 0%,transparent 50%),
-                   radial-gradient(circle at 80% 70%,rgba(180,130,255,.03) 0%,transparent 55%);
+  padding:2.5rem 1.5rem; position:relative; overflow-x:hidden;
+  /* 背景图铺满画面 + 暗色遮罩 */
+  background-image:
+    linear-gradient(rgba(11, 14, 20, 0.82), rgba(11, 14, 20, 0.82)),
+    url('143822601.jpg');
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
 }
 .hero {
+  position:relative; z-index:1;
   display:flex; flex-direction:column; align-items:flex-start; width:100%; max-width:1400px; text-align:left;
   padding-left:clamp(1.5rem,12vw,10rem); padding-right:clamp(1.5rem,12vw,10rem);
 }
@@ -105,6 +112,18 @@ body {
 }
 .article-links a:hover { color:#d6ecff; border-bottom-color:rgba(159,208,255,.5); }
 
+/* 功能区下方小字注释 */
+.bottom-caption {
+  position:relative; z-index:1;
+  margin-top:.9rem;
+  font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  font-weight:400;
+  font-size:clamp(.62rem,1.8vw,.72rem);
+  color:#5f6c82;
+  letter-spacing:.03em;
+  line-height:1.4;
+}
+
 .hero-spacer { width:100%; height:4.5rem; }
 .hero::after { content:''; display:block; width:70px; height:1px; background:linear-gradient(90deg,rgba(140,180,240,.3),transparent); margin-top:2rem; opacity:.7; }
 
@@ -166,7 +185,6 @@ body {
     </section>
 
     <div class="grid-block" aria-label="功能矩形区">
-      <!-- 左上：我的文章 -->
       <div class="mini-card">
         <span class="mini-title">我的文章</span>
         <div class="article-links">
@@ -175,7 +193,6 @@ body {
           <a href="https://www.luogu.com/article/mmy8k7wg" target="_blank" rel="noopener noreferrer">luoguP3803-FFT</a>
         </div>
       </div>
-      <!-- 右上：我的bilibili -->
       <div class="mini-card">
         <span class="mini-title">我的bilibili</span>
         <div class="article-links">
@@ -184,7 +201,6 @@ body {
           <a href="https://www.bilibili.com/video/BV1DYckz9EJd" target="_blank" rel="noopener noreferrer">malody ex2</a>
         </div>
       </div>
-      <!-- 左下：我的desmos -->
       <div class="mini-card">
         <span class="mini-title">我的desmos</span>
         <div class="article-links">
@@ -193,7 +209,6 @@ body {
           <a href="https://www.desmos.com/calculator/qy1ca17asu" target="_blank" rel="noopener noreferrer">高精度艺术</a>
         </div>
       </div>
-      <!-- 右下：你可能感兴趣 -->
       <div class="mini-card">
         <span class="mini-title">你可能感兴趣：</span>
         <div class="article-links">
@@ -204,6 +219,8 @@ body {
       </div>
     </div>
   </div>
+
+  <p class="bottom-caption">uni可爱~ 143822601</p>
 
   <div class="hero-spacer" aria-hidden="true"></div>
 </main>
