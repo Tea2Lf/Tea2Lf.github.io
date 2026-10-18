@@ -1,366 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tea2Lf · Toolbox</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0d1117; min-height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'JetBrains Mono','Fira Code','Consolas',monospace; padding: 24px; }
-        .card { background: #161b22; border: 1px solid #30363d; border-radius: 20px; padding: 40px 44px 36px; max-width: 880px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-        .header { text-align: center; border-bottom: 1px solid #21262d; padding-bottom: 18px; margin-bottom: 22px; }
-        .title { font-size: 38px; font-weight: 700; color: #f0f6fc; letter-spacing: 1px; }
-        .subtitle { font-size: 17px; color: #8b949e; margin-top: 2px; letter-spacing: 0.5px; }
-        .info-block { background: #0d1117; border: 1px solid #21262d; border-radius: 14px; padding: 12px 20px; margin-bottom: 24px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 6px 20px; }
-        .info-item { color: #b1bac4; font-size: 16px; }
-        .info-item .value { color: #f0f6fc; font-weight: 600; }
-        .info-item .prime-badge { display: inline-block; padding: 0 12px; border-radius: 30px; font-size: 14px; font-weight: 600; margin-left: 6px; }
-        .prime-badge.prime { color: #7ee787; border: 1px solid #2ea043; background: #1f6f3a; }
-        .prime-badge.composite { color: #ffa28b; border: 1px solid #da3633; background: #6b2a2a; }
-        .info-item .factor { color: #79c0ff; font-weight: 500; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tea2Lf · 夜间主题</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#0b0e14; min-height:100vh; display:flex; align-items:flex-start; justify-content:flex-start;
+  font-family:'Saira','Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  padding:2.5rem 1.5rem; position:relative;
+  background-image:radial-gradient(circle at 30% 40%,rgba(70,130,200,.03) 0%,transparent 50%),
+                   radial-gradient(circle at 80% 70%,rgba(180,130,255,.03) 0%,transparent 55%);
+}
+.hero {
+  display:flex; flex-direction:column; align-items:flex-start; width:100%; max-width:1400px; text-align:left;
+  padding-left:clamp(1.5rem,12vw,10rem); padding-right:clamp(1.5rem,12vw,10rem);
+}
+.header-row { display:flex; align-items:flex-start; justify-content:space-between; width:100%; gap:1.5rem; }
+.title-block { display:flex; flex-direction:column; align-items:flex-start; flex-shrink:0; }
+.hero-title {
+  font-weight:700; font-size:clamp(3.8rem,15vw,7.5rem); color:#f5f7fc; line-height:1.1;
+  text-shadow:0 0 40px rgba(100,180,255,.15),0 0 10px rgba(255,255,255,.08);
+  margin-bottom:.4rem; font-feature-settings:"ss01","ss02";
+}
+.hero-subtitle {
+  font-weight:400; font-size:clamp(.9rem,4vw,1.5rem); color:#b6c1d9; margin:.25rem 0 3rem;
+  white-space:nowrap; text-shadow:0 2px 8px rgba(0,0,0,.6);
+}
+.links-block {
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:.3rem .6rem;
+  font-weight:400; font-size:clamp(.78rem,2.6vw,.9rem); color:#6e7b91;
+  padding-top:clamp(1.2rem,5vw,2.4rem); justify-content:flex-end; text-align:right; line-height:1.7;
+}
+.links-block a { font-weight:400; color:#9fd0ff; text-decoration:none; border-bottom:1px solid transparent; transition:color .18s,border-color .18s; }
+.links-block a:hover { color:#d6ecff; border-bottom-color:rgba(159,208,255,.5); }
 
-        .tool-list { display: flex; flex-direction: column; gap: 16px; }
-        .tool-card { background: #0d1117; border: 1px solid #30363d; border-radius: 14px; padding: 16px 20px 18px; transition: border-color 0.25s; }
-        .tool-card:hover { border-color: #58a6ff; }
-        .tool-card .head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
-        .tool-card .name { color: #f0f6fc; font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
-        .tool-card .desc { color: #8b949e; font-size: 13px; letter-spacing: 0.3px; }
-        .tool-card .body { display: flex; flex-direction: column; gap: 8px; }
-        .tool-card .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-        .tool-card .row label { color: #b1bac4; font-size: 14px; min-width: 36px; }
-        .tool-card select, .tool-card input { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 14px; padding: 6px 10px; outline: none; flex: 1; min-width: 60px; }
-        .tool-card select:focus, .tool-card input:focus { border-color: #58a6ff; }
-        .tool-card select option { background: #161b22; }
-        .tool-card .input-group { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
-        .tool-card .input-group input { flex: 1; min-width: 50px; }
-        .tool-card .output { background: #0d1117; border: 1px solid #21262d; border-radius: 6px; padding: 8px 12px; color: #79c0ff; font-size: 15px; min-height: 32px; word-break: break-all; }
-        .tool-card .output .lbl { color: #8b949e; font-size: 13px; }
-        .tool-card .output .res { color: #f0f6fc; font-weight: 600; }
-        .btn { background: #1f6f3a; border: 1px solid #2ea043; color: #f0f6fc; font-family: inherit; font-size: 14px; font-weight: 600; padding: 6px 18px; border-radius: 30px; cursor: pointer; transition: all 0.2s; }
-        .btn:hover { background: #2ea043; transform: scale(1.02); }
-        .btn:active { transform: scale(0.97); }
+.content-row {
+  display:flex; align-items:stretch; justify-content:space-between; width:100%; gap:1.5rem;
+}
+.main-card {
+  flex:0 0 auto; width:min(560px,100%); background:#11161f; border:1px solid #2a3444; padding:1.75rem 1.6rem 1.9rem 2rem;
+  box-shadow:0 0 0 1px rgba(255,255,255,.02),0 10px 30px rgba(0,0,0,.35);
+  display:flex; flex-direction:column; align-items:flex-start; gap:.9rem;
+}
+.date-row { display:flex; align-items:flex-start; justify-content:space-between; width:100%; gap:1rem; }
+.card-date { font-weight:700; font-size:clamp(2rem,7vw,3rem); letter-spacing:.04em; color:#f0f4fb; line-height:1; }
+.tz-block { display:flex; flex-direction:column; align-items:flex-end; text-align:right; line-height:1.35; padding-top:.1rem; flex-shrink:0; }
+.tz-line1 { font-weight:700; font-size:clamp(1rem,3.2vw,1.15rem); color:#7d8aa3; letter-spacing:.04em; }
+.tz-line2 { font-weight:700; font-size:clamp(1.1rem,3.8vw,1.35rem); color:#9fb0c9; letter-spacing:.03em; }
+.combined-line { display:flex; align-items:baseline; flex-wrap:wrap; gap:.5rem .9rem; width:100%; }
+.combined-item { display:flex; align-items:baseline; gap:.45rem; }
+.combined-label { font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif; font-weight:400; font-size:clamp(.8rem,2.8vw,.9rem); color:#5f6c82; }
+.combined-value { font-weight:700; font-size:clamp(1rem,3.2vw,1.15rem); color:#9fd0ff; letter-spacing:.02em; }
+.combined-value sup { font-size:.7em; vertical-align:super; line-height:0; }
+.combined-joke { font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif; font-weight:400; font-size:clamp(.78rem,2.8vw,.9rem); color:#6e7b91; margin-left:.2rem; }
+.divider { font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif; color:#3a4658; user-select:none; }
+.future-block { margin-top:.4rem; padding-top:.9rem; border-top:1px solid #202836; width:100%; display:flex; flex-direction:column; gap:.55rem; }
+.future-title { font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif; font-weight:400; font-size:clamp(.8rem,2.8vw,.9rem); color:#5f6c82; }
+.future-list { display:flex; flex-wrap:wrap; gap:.6rem 1.4rem; list-style:none; }
+.future-item { font-weight:700; font-size:clamp(1rem,3.2vw,1.2rem); color:#c7d8f2; letter-spacing:.03em; }
 
-        .factor-result .prime-part { color: #79c0ff; font-size: 18px; font-weight: 500; }
-        .factor-result .error-text { color: #ffa28b; font-size: 16px; }
-        .factor-result .strong-text { color: #ff4444; font-size: 20px; font-weight: 700; animation: strongPulse 0.4s ease-in-out infinite alternate; }
-        @keyframes strongPulse { 0% { opacity: 0.6; transform: scale(0.96); } 100% { opacity: 1; transform: scale(1.04); } }
+.grid-block {
+  flex:1 1 auto; min-width:0;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  grid-template-rows:repeat(2, 1fr);
+  gap:.75rem;
+  align-self:stretch;
+}
+.mini-card {
+  background:#11161f; border:1px solid #2a3444; padding:.85rem 1rem 1rem;
+  box-shadow:0 0 0 1px rgba(255,255,255,.02),0 6px 18px rgba(0,0,0,.3);
+  display:flex; flex-direction:column; align-items:flex-start; gap:.55rem;
+  min-width:0; min-height:0;
+  justify-content:flex-start;
+}
+.mini-title {
+  font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  font-weight:400; font-size:clamp(.72rem,2.4vw,.82rem); color:#6e7b91; letter-spacing:.03em;
+  line-height:1.2;
+}
+.mini-body {
+  font-family:'Saira','Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  font-weight:700; font-size:clamp(.9rem,3vw,1.05rem); color:#9fd0ff; letter-spacing:.02em;
+  min-height:1.2em;
+}
 
-        .collatz-chain { max-height: 80px; overflow-y: auto; font-size: 14px; color: #b1bac4; line-height: 1.6; word-break: break-all; scrollbar-width: thin; scrollbar-color: #30363d transparent; }
-        .collatz-chain::-webkit-scrollbar { width: 4px; }
-        .collatz-chain::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
-        .collatz-chain .highlight { color: #79c0ff; font-weight: 500; }
-        .collatz-chain .arr { color: #484f58; }
+.article-links {
+  display:flex; flex-direction:column; gap:.45rem; width:100%;
+  margin-top:.15rem;
+  flex:0 0 auto;
+}
+.article-links a {
+  font-family:'Saira','Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  font-weight:400; font-size:clamp(.82rem,2.8vw,.95rem);
+  color:#9fd0ff; text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:color .18s,border-color .18s;
+  line-height:1.5;
+}
+.article-links a:hover { color:#d6ecff; border-bottom-color:rgba(159,208,255,.5); }
 
-        .chart-wrap { margin-top: 6px; background: #0d1117; border: 1px solid #21262d; border-radius: 8px; padding: 8px; }
-        .chart-wrap canvas { display: block; width: 100%; height: auto; border-radius: 4px; }
+.hero-spacer { width:100%; height:4.5rem; }
+.hero::after { content:''; display:block; width:70px; height:1px; background:linear-gradient(90deg,rgba(140,180,240,.3),transparent); margin-top:2rem; opacity:.7; }
 
-        .nuke-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a0000; display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; animation: nukeFlash 0.5s ease 3; }
-        .nuke-overlay.active { display: flex; }
-        .nuke-text { color: #ff3333; font-size: 44px; font-weight: 700; text-align: center; line-height: 1.4; text-shadow: 0 0 40px #ff000066; animation: nukePulse 0.6s ease-in-out infinite alternate; }
-        .nuke-sub { color: #cc6666; font-size: 18px; margin-top: 14px; letter-spacing: 4px; }
-        .nuke-dismiss { margin-top: 36px; background: transparent; border: 1px solid #ff3333; color: #ff6666; font-family: inherit; font-size: 15px; padding: 8px 28px; border-radius: 30px; cursor: pointer; transition: all 0.3s; }
-        .nuke-dismiss:hover { background: #ff3333; color: #1a0000; }
-        @keyframes nukeFlash { 0%,100% { background: #1a0000; } 50% { background: #330000; } }
-        @keyframes nukePulse { 0% { opacity: 0.7; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1.02); } }
-
-        @media (max-width:620px) {
-            .card { padding: 16px 12px 14px; }
-            .title { font-size: 26px; }
-            .subtitle { font-size: 14px; }
-            .info-block { padding: 8px 12px; gap: 4px 10px; font-size: 13px; }
-            .tool-card { padding: 12px 14px 14px; }
-            .tool-card .name { font-size: 17px; }
-            .nuke-text { font-size: 26px; }
-        }
-    </style>
+@media (max-width:900px) {
+  .content-row { flex-direction:column; align-items:stretch; }
+  .main-card { width:100%; }
+  .grid-block { width:100%; grid-template-rows:auto auto; align-self:auto; }
+  .mini-card { min-height:auto; }
+}
+@media (max-width:640px) {
+  .hero { padding-left:1rem; padding-right:1rem; }
+  .hero-subtitle { white-space:normal; font-size:.9rem; }
+  .main-card { padding:1.4rem 1.1rem 1.5rem 1.3rem; }
+  .grid-block { gap:.6rem; grid-template-columns:1fr; }
+  .mini-card { padding:.7rem .8rem .85rem; }
+}
+</style>
 </head>
 <body>
-
-<div class="nuke-overlay" id="nukeOverlay">
-    <div class="nuke-text" id="nukeText">!!! NUCLEAR LAUNCH DETECTED !!!</div>
-    <div class="nuke-sub" id="nukeSub">INVALID INPUT</div>
-    <button class="nuke-dismiss" id="nukeDismiss">abort</button>
-</div>
-
-<div class="card">
-    <div class="header"><div class="title">Hello, I'm Tea2Lf.</div><div class="subtitle">What can I help you?</div></div>
-
-    <div class="info-block">
-        <span class="info-item">DATE: <span class="value" id="dateDisplay">20260810</span></span>
-        <span class="info-item" id="primeDisplay">STATUS: <span class="prime-badge" style="background:#30363d;color:#8b949e;border-color:#30363d;">...</span></span>
-        <span class="info-item">FACTOR: <span class="factor" id="factorDisplay">---</span></span>
+<main class="hero">
+  <div class="header-row">
+    <div class="title-block">
+      <h1 class="hero-title">Tea2Lf</h1>
+      <p class="hero-subtitle">关于我的一切</p>
     </div>
+    <nav class="links-block" aria-label="社交链接">
+      我的
+      <a href="https://github.com/Tea2Lf" target="_blank" rel="noopener noreferrer">github</a>
+      <a href="https://www.luogu.com/user/1726951" target="_blank" rel="noopener noreferrer">luogu</a>
+      <a href="https://hydro.ac/user/98681" target="_blank" rel="noopener noreferrer">hydro</a>
+      <a href="https://codeforces.com/profile/Tea2Lf" target="_blank" rel="noopener noreferrer">CF</a>
+      <a href="https://atcoder.jp/users/Tea2Lf" target="_blank" rel="noopener noreferrer">AtC</a>
+      <a href="https://space.bilibili.com/1339147554" target="_blank" rel="noopener noreferrer">bilibili</a>
+      <a href="https://x.com/Tea2Lf" target="_blank" rel="noopener noreferrer">twitter</a>
+      <a href="https://osu.ppy.sh/users/38156043" target="_blank" rel="noopener noreferrer">osu</a>
+    </nav>
+  </div>
 
-    <div class="tool-list">
-
-        <!-- ===== CALC ===== -->
-        <div class="tool-card">
-            <div class="head"><span class="name">Calc</span><span class="desc">brain helper</span></div>
-            <div class="body">
-                <div class="row">
-                    <label>fn</label>
-                    <select id="funcSelect">
-                        <option value="gcd">gcd</option><option value="lcm">lcm</option>
-                        <option value="exgcd">exgcd</option><option value="inv">inv</option>
-                        <option value="phi">phi</option><option value="tau">tau</option>
-                        <option value="sigma">sigma</option><option value="pi">pi</option>
-                        <option value="mod">mod</option>
-                    </select>
-                </div>
-                <div class="row">
-                    <label>in</label>
-                    <div class="input-group" id="inputGroup"></div>
-                </div>
-                <div class="row">
-                    <label>out</label>
-                    <span style="color:#484f58;font-size:13px;" id="outputLabel">(auto)</span>
-                </div>
-                <div class="output" id="outputDisplay"><span class="lbl">result: </span><span class="res" id="resultValue">--</span></div>
-                <div style="text-align:right;margin-top:2px;"><button class="btn" id="calcRunBtn">run</button></div>
-            </div>
+  <div class="content-row">
+    <section class="main-card" aria-label="日期与属性信息">
+      <div class="date-row">
+        <div class="card-date" id="todayDate">00000000</div>
+        <div class="tz-block">
+          <span class="tz-line1">UTC+8:00</span>
+          <span class="tz-line2" id="tzLine2">—</span>
         </div>
+      </div>
 
-        <!-- ===== FACTOR ===== -->
-        <div class="tool-card">
-            <div class="head"><span class="name">Factor</span><span class="desc">prime factorization</span></div>
-            <div class="body">
-                <div class="row"><label>n</label><input type="text" id="factorInput" placeholder="integer >= 2" style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#f0f6fc;font-family:inherit;font-size:14px;padding:6px 10px;outline:none;min-width:60px;"></div>
-                <div class="output factor-result" id="factorResult"><span style="color:#484f58;">--</span></div>
-                <div style="text-align:right;margin-top:2px;"><button class="btn" id="factorRunBtn">factor</button></div>
-            </div>
+      <div class="combined-line">
+        <div class="combined-item"><span class="combined-label">标准分解</span><span class="combined-value" id="factorization">—</span></div>
+        <span class="divider">|</span>
+        <div class="combined-item"><span class="combined-value" id="attrLabel">合数</span><span class="combined-joke" id="attrJoke">普通的一天</span></div>
+      </div>
+
+      <div class="future-block">
+        <span class="future-title">后续三个素数天：</span>
+        <ul class="future-list" id="futureList"></ul>
+      </div>
+    </section>
+
+    <div class="grid-block" aria-label="功能矩形区">
+      <!-- 左上：我的文章 -->
+      <div class="mini-card">
+        <span class="mini-title">我的文章</span>
+        <div class="article-links">
+          <a href="https://www.luogu.com/article/ehfvildv" target="_blank" rel="noopener noreferrer">luoguP2303</a>
+          <a href="https://www.luogu.com/article/d4n509jn" target="_blank" rel="noopener noreferrer">luoguP2568</a>
+          <a href="https://www.luogu.com/article/mmy8k7wg" target="_blank" rel="noopener noreferrer">luoguP3803-FFT</a>
         </div>
-
-        <!-- ===== 421 ===== -->
-        <div class="tool-card">
-            <div class="head"><span class="name">421</span><span class="desc">Collatz (3x+1)</span></div>
-            <div class="body">
-                <div class="row"><label>n</label><input type="text" id="collatzInput" placeholder="positive integer" style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#f0f6fc;font-family:inherit;font-size:14px;padding:6px 10px;outline:none;min-width:60px;"></div>
-                <div class="row" style="gap:4px 16px;">
-                    <span style="color:#8b949e;font-size:13px;">steps: <span style="color:#f0f6fc;font-weight:600;" id="collatzSteps">--</span></span>
-                    <span style="color:#8b949e;font-size:13px;">max: <span style="color:#79c0ff;font-weight:600;" id="collatzMax">--</span></span>
-                </div>
-                <div class="collatz-chain" id="collatzChain"><span style="color:#484f58;">--</span></div>
-                <div class="chart-wrap"><canvas id="collatzChart" width="800" height="200"></canvas></div>
-                <div style="text-align:right;margin-top:2px;"><button class="btn" id="collatzRunBtn">run</button></div>
-            </div>
+      </div>
+      <!-- 右上：我的bilibili -->
+      <div class="mini-card">
+        <span class="mini-title">我的bilibili</span>
+        <div class="article-links">
+          <a href="https://www.bilibili.com/video/BV1Dq8d6JEPj" target="_blank" rel="noopener noreferrer">虹极确认</a>
+          <a href="https://www.bilibili.com/video/BV1f8hw6EEmm" target="_blank" rel="noopener noreferrer">虹极分表</a>
+          <a href="https://www.bilibili.com/video/BV1DYckz9EJd" target="_blank" rel="noopener noreferrer">malody ex2</a>
         </div>
-
+      </div>
+      <!-- 左下：我的desmos -->
+      <div class="mini-card">
+        <span class="mini-title">我的desmos</span>
+        <div class="article-links">
+          <a href="https://www.desmos.com/calculator/8degiuvwyp" target="_blank" rel="noopener noreferrer">adofai simulator</a>
+          <a href="https://www.desmos.com/calculator/1bafkdwkdu" target="_blank" rel="noopener noreferrer">bfs</a>
+          <a href="https://www.desmos.com/calculator/qy1ca17asu" target="_blank" rel="noopener noreferrer">高精度艺术</a>
+        </div>
+      </div>
+      <!-- 右下：你可能感兴趣 -->
+      <div class="mini-card">
+        <span class="mini-title">你可能感兴趣：</span>
+        <div class="article-links">
+          <a href="https://www.desmos.com" target="_blank" rel="noopener noreferrer">desmos</a>
+          <a href="https://x.com/chunithm" target="_blank" rel="noopener noreferrer">chunithm公式</a>
+          <a href="https://osu.ppy.sh/" target="_blank" rel="noopener noreferrer">osu!</a>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+
+  <div class="hero-spacer" aria-hidden="true"></div>
+</main>
 
 <script>
 (function(){
-'use strict';
+  const toInt=(y,m,d)=>y*10000+m*100+d;
 
-// ----- DOM refs -----
-const O=document.getElementById('nukeOverlay'), NT=document.getElementById('nukeText'), NS=document.getElementById('nukeSub'), ND=document.getElementById('nukeDismiss');
-const FS=document.getElementById('funcSelect'), IG=document.getElementById('inputGroup'), OL=document.getElementById('outputLabel'), RV=document.getElementById('resultValue'), CR=document.getElementById('calcRunBtn');
-const FI=document.getElementById('factorInput'), FR=document.getElementById('factorResult'), FRun=document.getElementById('factorRunBtn');
-const CI=document.getElementById('collatzInput'), CS=document.getElementById('collatzSteps'), CM=document.getElementById('collatzMax'), CC=document.getElementById('collatzChain'), CV=document.getElementById('collatzChart'), CRun=document.getElementById('collatzRunBtn');
+  function todayUTC8(){
+    const d=new Date(Date.now()+8*3600*1000);
+    return {y:d.getUTCFullYear(),m:d.getUTCMonth()+1,d:d.getUTCDate(),weekday:d.getUTCDay()};
+  }
+  function validDate(y,m,d){
+    if(m<1||m>12||d<1||d>31)return false;
+    const dm=[31,28,31,30,31,30,31,31,30,31,30,31];
+    if((y%4===0&&y%100!==0)||y%400===0)dm[1]=29;
+    return d<=dm[m-1];
+  }
+  function nextDay(y,m,d){
+    const t=new Date(Date.UTC(y,m-1,d)); t.setUTCDate(t.getUTCDate()+1);
+    return toInt(t.getUTCFullYear(),t.getUTCMonth()+1,t.getUTCDate());
+  }
+  function splitInt(n){ return [Math.floor(n/10000),Math.floor(n%10000/100),n%100]; }
 
-// ----- nuke -----
-let nukeActive=false, nukeTimer=null;
-function nuke(msg,sub){ if(nukeActive)return; nukeActive=true; if(msg)NT.textContent=msg; if(sub)NS.textContent=sub; O.classList.add('active'); clearTimeout(nukeTimer); nukeTimer=setTimeout(dismissNuke,6000); }
-function dismissNuke(){ nukeActive=false; O.classList.remove('active'); clearTimeout(nukeTimer); }
-ND.addEventListener('click',dismissNuke);
+  function isPrime(n){
+    if(!Number.isInteger(n)||n<2)return false;
+    if(n===2||n===3)return true;
+    if(n%2===0||n%3===0)return false;
+    const lim=Math.floor(Math.sqrt(n));
+    for(let i=5;i<=lim;i+=6) if(n%i===0||n%(i+2)===0)return false;
+    return true;
+  }
+  const isSq=n=>{ if(n<1)return false; const r=Math.round(Math.sqrt(n)); return r*r===n; };
+  function isMersenne(n){
+    if(!isPrime(n))return false;
+    const p=n+1; return (p&(p-1))===0&&p>1;
+  }
+  function isFermat(n){
+    if(!isPrime(n))return false;
+    const q=n-1; if(q<1||(q&(q-1))!==0)return false;
+    const e=Math.log2(q); return Number.isInteger(e)&&(e&(e-1))===0&&e>=1;
+  }
 
-// ----- math -----
-function gcd(a,b){ a=Math.abs(a);b=Math.abs(b); while(b){let t=a%b;a=b;b=t;} return a; }
-function lcm(a,b){ if(a===0||b===0)return 0; return Math.abs(a)/gcd(a,b)*Math.abs(b); }
-function exgcd(a,b){ if(b===0)return {g:Math.abs(a),x:a<0?-1:1,y:0}; let r=exgcd(b,a%b); return {g:r.g,x:r.y,y:r.x-Math.floor(a/b)*r.y}; }
-function modInv(a,m){ a=((a%m)+m)%m; let r=exgcd(a,m); if(r.g!==1)return null; return ((r.x%m)+m)%m; }
-function phi(n){ if(n<1)return 0; let num=n,res=n; if(num%2===0){while(num%2===0)num/=2;res-=res/2;} for(let p=3;p*p<=num;p+=2){if(num%p===0){while(num%p===0)num/=p;res-=res/p;}} if(num>1)res-=res/num; return res; }
-function tau(n){ if(n<1)return 0; let num=n,c,total=1; c=0;while(num%2===0){c++;num/=2;}if(c)total*=c+1; for(let p=3;p*p<=num;p+=2){c=0;while(num%p===0){c++;num/=p;}if(c)total*=c+1;} if(num>1)total*=2; return total; }
-function sigma(n){ if(n<1)return 0; let num=n,sum=1,c; c=0;while(num%2===0){c++;num/=2;}if(c)sum*=(Math.pow(2,c+1)-1); for(let q=3;q*q<=num;q+=2){c=0;while(num%q===0){c++;num/=q;}if(c)sum*=(Math.pow(q,c+1)-1)/(q-1);} if(num>1)sum*=(num*num-1)/(num-1); return sum; }
-function pi(n){ if(n<2)return 0; let cnt=0, a=new Uint8Array(n+1); for(let i=2;i<=n;i++)a[i]=1; for(let i=2;i*i<=n;i++)if(a[i])for(let j=i*i;j<=n;j+=i)a[j]=0; for(let i=2;i<=n;i++)if(a[i])cnt++; return cnt; }
-function modFn(a,m){ if(m===0)return null; return ((a%m)+m)%m; }
+  function factorize(n){
+    if(!Number.isInteger(n)||n<2)return '—';
+    const parts=[];
+    let x=n;
+    for(let p=2;p*p<=x;p++){
+      if(x%p===0){
+        let cnt=0;
+        while(x%p===0){x/=p;cnt++;}
+        parts.push(cnt>1?p+'<sup>'+cnt+'</sup>':String(p));
+      }
+    }
+    if(x>1) parts.push(String(x));
+    return parts.join(' × ');
+  }
 
-// ----- factorize BigInt -----
-function factorizeBigInt(n){ if(n<2n)return[]; let num=n, factors=[], c=0n; while(num%2n===0n){c++;num/=2n;} if(c)factors.push({p:2n,e:c}); for(let p=3n;p*p<=num;p+=2n){c=0n; while(num%p===0n){c++;num/=p;} if(c)factors.push({p:p,e:c});} if(num>1n)factors.push({p:num,e:1n}); return factors; }
-function factorString(f){ if(!f||!f.length)return '(none)'; return f.map(x=>x.e===1n?String(x.p):String(x.p)+'^'+String(x.e)).join(' * '); }
+  function attr(n){
+    if(isFermat(n))   return {label:'费马素数',joke:'可以发论文了啊……'};
+    if(isMersenne(n)) return {label:'梅森素数',joke:'大大吉！！！'};
+    if(isPrime(n))    return {label:'素数',joke:'大吉的一天'};
+    if(isSq(n))       return {label:'完全平方数',joke:'神秘的一天'};
+    return {label:'合数',joke:'普通的一天'};
+  }
 
-// ===== CALC =====
-const funcDefs={
- gcd:{i:2,lbl:['a','b'],ol:['gcd'], c:function(a){ let x=parseInt(a[0])||0,y=parseInt(a[1])||0; return [gcd(x,y)]; }},
- lcm:{i:2,lbl:['a','b'],ol:['lcm'], c:function(a){ let x=parseInt(a[0])||0,y=parseInt(a[1])||0; return [lcm(x,y)]; }},
- exgcd:{i:2,lbl:['a','b'],ol:['g','x','y'], c:function(a){ let x=parseInt(a[0])||0,y=parseInt(a[1])||0; let r=exgcd(x,y); return [r.g,r.x,r.y]; }},
- inv:{i:2,lbl:['a','m'],ol:['inv'], c:function(a){ let x=parseInt(a[0])||0,m=parseInt(a[1])||1; let r=modInv(x,m); return r===null?['(no inverse)']:[r]; }},
- phi:{i:1,lbl:['n'],ol:['phi(n)'], c:function(a){ let n=parseInt(a[0])||0; return [phi(n)]; }},
- tau:{i:1,lbl:['n'],ol:['tau(n)'], c:function(a){ let n=parseInt(a[0])||0; return [tau(n)]; }},
- sigma:{i:1,lbl:['n'],ol:['sigma(n)'], c:function(a){ let n=parseInt(a[0])||0; return [sigma(n)]; }},
- pi:{i:1,lbl:['n'],ol:['pi(n)'], c:function(a){ let n=parseInt(a[0])||0; return [pi(n)]; }},
- mod:{i:2,lbl:['a','m'],ol:['a mod m'], c:function(a){ let x=parseInt(a[0])||0,m=parseInt(a[1])||0; return m===0?['(mod 0 undefined)']:[modFn(x,m)]; }}
-};
+  const MON=['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+  const WD=['Su.','Mo.','Tu.','We.','Th.','Fr.','Sa.'];
+  function ordinal(d){
+    const m100=d%100;
+    if(m100>=11&&m100<=13)return 'th';
+    return d%10===1?'st':d%10===2?'nd':d%10===3?'rd':'th';
+  }
+  function tzLine2(o){ return MON[o.m-1]+' '+o.d+ordinal(o.d)+' '+WD[o.weekday]; }
 
-function renderInputs(){
- const key=FS.value, def=funcDefs[key]; if(!def)return;
- IG.innerHTML=''; for(let i=0;i<def.i;i++){ let inp=document.createElement('input'); inp.type='text'; inp.placeholder=def.lbl[i]||('arg'+(i+1)); inp.className='calc-input'; IG.appendChild(inp); }
- OL.textContent=def.ol.length===1?def.ol[0]:def.ol.join(' , ');
- RV.textContent='--';
-}
+  const t=todayUTC8();
+  const ti=toInt(t.y,t.m,t.d);
 
-function runCalc(){
- const key=FS.value, def=funcDefs[key]; if(!def)return;
- const args=[]; IG.querySelectorAll('.calc-input').forEach(inp=>args.push(inp.value.trim()||'0'));
- let res; try{ res=def.c(args); }catch(e){ RV.textContent='(error)'; return; }
- RV.textContent=res.length===1?String(res[0]):res.map(String).join(' , ');
-}
+  document.getElementById('todayDate').textContent=String(ti);
+  document.getElementById('tzLine2').textContent=tzLine2(t);
 
-FS.addEventListener('change',renderInputs);
-CR.addEventListener('click',runCalc);
+  document.getElementById('factorization').innerHTML=factorize(ti);
 
-// ===== FACTOR =====
-function runFactor(){
- const raw=FI.value.trim(); if(raw===''){ FR.innerHTML='<span style="color:#484f58;">--</span>'; return; }
- let n; try{ n=BigInt(raw); }catch(e){ nuke('!!! NUCLEAR LAUNCH DETECTED !!!','INVALID INPUT'); FR.innerHTML='<span class="error-text">invalid input</span>'; return; }
- if(n<2n){ nuke('!!! NUCLEAR LAUNCH DETECTED !!!','INPUT < 2'); FR.innerHTML='<span class="error-text">n >= 2</span>'; return; }
- const start=Date.now(); let done=false;
- function doFactor(){
-  try{
-   const factors=factorizeBigInt(n);
-   if(Date.now()-start>60000){ nuke('your number is so strong!','TIME OUT'); FR.innerHTML='<span class="strong-text">your number is so strong!</span>'; done=true; return; }
-   if(!factors||!factors.length){ FR.innerHTML='<span class="error-text">(error)</span>'; done=true; return; }
-   const fs=factorString(factors);
-   const isPrime=(factors.length===1 && factors[0].e===1n && factors[0].p===n);
-   const tag=isPrime?' <span style="color:#7ee787;font-size:14px;">[prime]</span>':'';
-   FR.innerHTML='<span class="prime-part">'+fs+'</span>'+tag+'<span style="color:#484f58;font-size:13px;margin-left:6px;"> = '+String(n)+'</span>';
-   done=true;
-  }catch(e){ FR.innerHTML='<span class="error-text">(error)</span>'; done=true; }
- }
- if(n<1000000000000000n){ doFactor(); }else{ function chunk(){ if(done)return; if(Date.now()-start>60000){ nuke('your number is so strong!','TIME OUT'); FR.innerHTML='<span class="strong-text">your number is so strong!</span>'; done=true; return; } doFactor(); if(!done)setTimeout(chunk,50); } chunk(); }
-}
-FRun.addEventListener('click',runFactor);
+  const a=attr(ti);
+  document.getElementById('attrLabel').textContent=a.label;
+  document.getElementById('attrJoke').textContent=a.joke;
 
-// ===== 421 (Collatz) with chart =====
-let lastCollatzData=[];
-
-function drawChart(data){
- const canvas=CV, rect=canvas.parentElement.getBoundingClientRect();
- const dpr=window.devicePixelRatio||1;
- const w=Math.min(rect.width||800,800), h=200;
- canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px';
- const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
- const pad={top:16,bottom:20,left:32,right:12};
- const innerW=w-pad.left-pad.right, innerH=h-pad.top-pad.bottom;
- ctx.clearRect(0,0,w,h);
-
- if(!data||data.length<2){ ctx.fillStyle='#484f58'; ctx.font='14px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('no data',w/2,h/2+5); return; }
-
- const maxVal=Math.max(...data);
- const logMax=Math.log10(maxVal+1);
- if(logMax===0){ ctx.fillStyle='#484f58'; ctx.font='14px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('constant',w/2,h/2+5); return; }
-
- // axes
- ctx.strokeStyle='#30363d'; ctx.lineWidth=1;
- ctx.beginPath(); ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+innerH); ctx.lineTo(pad.left+innerW,pad.top+innerH); ctx.stroke();
-
- // y labels
- ctx.fillStyle='#484f58'; ctx.font='10px monospace'; ctx.textAlign='right'; ctx.textBaseline='middle';
- for(let i=0;i<=4;i++){
-  const val=Math.pow(10,i);
-  if(val>maxVal*10)break;
-  const y=pad.top+innerH - (i/4)*innerH;
-  ctx.fillText('10^'+i,pad.left-4,y);
-  ctx.strokeStyle='#21262d'; ctx.lineWidth=0.5; ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+innerW,y); ctx.stroke();
- }
-
- // x labels
- ctx.fillStyle='#484f58'; ctx.font='10px monospace'; ctx.textAlign='center'; ctx.textBaseline='top';
- const step=Math.max(1,Math.floor(data.length/8));
- for(let i=0;i<data.length;i+=step){
-  const x=pad.left+(i/(data.length-1))*innerW;
-  ctx.fillText(i,x,pad.top+innerH+4);
- }
-
- // plot
- ctx.strokeStyle='#79c0ff'; ctx.lineWidth=1.5;
- ctx.beginPath();
- for(let i=0;i<data.length;i++){
-  const x=pad.left+(i/(data.length-1))*innerW;
-  const logVal=Math.log10(data[i]+1);
-  const y=pad.top+innerH - (logVal/logMax)*innerH;
-  if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y);
- }
- ctx.stroke();
-
- // end point
- if(data.length>0){
-  const last=data[data.length-1];
-  const x=pad.left+innerW;
-  const logVal=Math.log10(last+1);
-  const y=pad.top+innerH - (logVal/logMax)*innerH;
-  ctx.fillStyle='#7ee787'; ctx.beginPath(); ctx.arc(x,y,3,0,2*Math.PI); ctx.fill();
- }
-}
-
-function runCollatz(){
- const raw=CI.value.trim();
- if(raw===''){ CS.textContent='--'; CM.textContent='--'; CC.innerHTML='<span style="color:#484f58;">--</span>'; drawChart([]); lastCollatzData=[]; return; }
- let n; try{ n=BigInt(raw); }catch(e){ nuke('!!! NUCLEAR LAUNCH DETECTED !!!','INVALID INPUT'); CS.textContent='(error)'; CM.textContent='--'; CC.innerHTML=''; drawChart([]); lastCollatzData=[]; return; }
- if(n<1n){ nuke('!!! NUCLEAR LAUNCH DETECTED !!!','INPUT < 1'); CS.textContent='(error)'; CM.textContent='--'; CC.innerHTML=''; drawChart([]); lastCollatzData=[]; return; }
-
- const parts=[Number(n)]; let x=n, k=0, maxVal=Number(n);
- const maxSteps=100000;
- while(x!==1n && k<maxSteps){
-  if(x%2n===1n){ x=3n*x+1n; }else{ x/=2n; }
-  k++;
-  const v=Number(x);
-  parts.push(v);
-  if(v>maxVal)maxVal=v;
- }
- lastCollatzData=parts;
-
- if(k>=maxSteps){ CS.textContent='>'+maxSteps+' (abort)'; CM.textContent=maxVal; CC.innerHTML='<span style="color:#ffa28b;">too many steps</span>'; drawChart(parts); return; }
-
- CS.textContent=k; CM.textContent=maxVal;
- let display;
- if(parts.length<=60){
-  display=parts.map((v,i)=>i===parts.length-1?'<span class="highlight">'+v+'</span>':v+' <span class="arr">→</span> ').join('');
- }else{
-  const head=parts.slice(0,20).map(v=>String(v)+' → ').join('');
-  const tail=' ... → '+parts.slice(-10).map((v,i)=>i===9?'<span class="highlight">'+v+'</span>':v+' → ').join('');
-  display=head+tail;
- }
- CC.innerHTML=display;
- drawChart(parts);
-}
-CRun.addEventListener('click',runCollatz);
-
-// ===== Enter key =====
-document.addEventListener('keydown',function(e){
- if(e.key!=='Enter')return;
- if(e.target===FS || e.target.closest('.calc-input')){ e.preventDefault(); runCalc(); }
- else if(e.target===FI){ e.preventDefault(); runFactor(); }
- else if(e.target===CI){ e.preventDefault(); runCollatz(); }
-});
-
-// ===== Resize chart =====
-let resizeTimer;
-window.addEventListener('resize',function(){
- clearTimeout(resizeTimer);
- resizeTimer=setTimeout(function(){ if(lastCollatzData.length)drawChart(lastCollatzData); },300);
-});
-
-// ===== Date info =====
-function updateInfo(){
- const now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,'0'), d=String(now.getDate()).padStart(2,'0');
- const ds=y+m+d, num=parseInt(ds,10);
- document.getElementById('dateDisplay').textContent=ds;
- const pe=document.getElementById('primeDisplay'), badge=pe.querySelector('.prime-badge');
- function isPrime(n){ if(n<2)return false; if(n===2)return true; if(n%2===0)return false; for(let i=3;i*i<=n;i+=2)if(n%i===0)return false; return true; }
- function fac(n){ if(n<2)return[]; let num=n,f=[],c; c=0;while(num%2===0){c++;num/=2;}if(c)f.push({p:2,e:c}); for(let p=3;p*p<=num;p+=2){c=0;while(num%p===0){c++;num/=p;}if(c)f.push({p:p,e:c});} if(num>1)f.push({p:num,e:1}); return f; }
- const isP=isPrime(num), factors=fac(num);
- if(isP){ badge.textContent='PRIME'; badge.className='prime-badge prime'; }
- else if(num<2){ badge.textContent='NEITHER'; badge.className='prime-badge'; badge.style.cssText='color:#8b949e;border-color:#30363d;background:#0d1117;'; }
- else { badge.textContent='COMPOSITE'; badge.className='prime-badge composite'; }
- const fe=document.getElementById('factorDisplay');
- if(num<2||!factors.length){ fe.textContent='--'; }
- else { fe.textContent=factors.map(f=>f.e===1?f.p:f.p+'^'+f.e).join(' * '); }
-}
-
-// ===== Init =====
-updateInfo();
-renderInputs();
+  const list=document.getElementById('futureList');
+  list.innerHTML='';
+  let found=0, cy=t.y, cm=t.m, cd=t.d, guard=0;
+  while(found<3&&guard<100000){
+    guard++;
+    const ni=nextDay(cy,cm,cd);
+    [cy,cm,cd]=splitInt(ni);
+    if(!validDate(cy,cm,cd))continue;
+    if(isPrime(ni)){
+      found++;
+      const li=document.createElement('li');
+      li.className='future-item'; li.textContent=String(ni);
+      list.appendChild(li);
+    }
+  }
+  if(found<3){
+    const li=document.createElement('li');
+    li.className='future-item'; li.textContent='——';
+    list.appendChild(li);
+  }
 })();
 </script>
 </body>
