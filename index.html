@@ -9,19 +9,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background:#0b0e14; min-height:100vh; display:flex; align-items:flex-start; justify-content:flex-start;
-  font-family:'Saira','Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
-  padding:2.5rem 1.5rem; position:relative; overflow-x:hidden;
-  /* 背景图铺满画面 + 暗色遮罩 */
+
+/* 背景图层：焊死在视口 */
+.bg {
+  position:fixed; inset:0; z-index:-1;
   background-image:
-    linear-gradient(rgba(11, 14, 20, 0.82), rgba(11, 14, 20, 0.82)),
+    linear-gradient(rgba(11,14,20,.82), rgba(11,14,20,.82)),
     url('143822601.jpg');
-  background-size: cover, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
-  background-attachment: fixed, fixed;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
 }
+
+body {
+  background:#0b0e14; min-height:100vh;
+  display:flex; align-items:flex-start; justify-content:flex-start;
+  font-family:'Saira','Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  padding:2.5rem 1.5rem; overflow-x:hidden;
+}
+
 .hero {
   position:relative; z-index:1;
   display:flex; flex-direction:column; align-items:flex-start; width:100%; max-width:1400px; text-align:left;
@@ -46,11 +52,11 @@ body {
 .links-block a { font-weight:400; color:#9fd0ff; text-decoration:none; border-bottom:1px solid transparent; transition:color .18s,border-color .18s; }
 .links-block a:hover { color:#d6ecff; border-bottom-color:rgba(159,208,255,.5); }
 
-.content-row {
-  display:flex; align-items:stretch; justify-content:space-between; width:100%; gap:1.5rem;
-}
+/* 左列：主卡片 + 421 曲线模块，二者同宽 */
+.left-col { flex:0 0 auto; width:min(560px,100%); display:flex; flex-direction:column; gap:1.25rem; }
+.content-row { display:flex; align-items:flex-start; justify-content:space-between; width:100%; gap:1.5rem; }
 .main-card {
-  flex:0 0 auto; width:min(560px,100%); background:#11161f; border:1px solid #2a3444; padding:1.75rem 1.6rem 1.9rem 2rem;
+  width:100%; background:#11161f; border:1px solid #2a3444; padding:1.75rem 1.6rem 1.9rem 2rem;
   box-shadow:0 0 0 1px rgba(255,255,255,.02),0 10px 30px rgba(0,0,0,.35);
   display:flex; flex-direction:column; align-items:flex-start; gap:.9rem;
 }
@@ -71,20 +77,35 @@ body {
 .future-list { display:flex; flex-wrap:wrap; gap:.6rem 1.4rem; list-style:none; }
 .future-item { font-weight:700; font-size:clamp(1rem,3.2vw,1.2rem); color:#c7d8f2; letter-spacing:.03em; }
 
+/* 421 曲线模块 */
+.c421-card {
+  width:100%; background:#11161f; border:1px solid #2a3444; padding:1rem 1.1rem 1.1rem;
+  box-shadow:0 0 0 1px rgba(255,255,255,.02),0 10px 30px rgba(0,0,0,.35);
+  display:flex; flex-direction:column; gap:.6rem;
+}
+.c421-svg { display:block; width:100%; height:auto; }
+.c421-meta {
+  display:flex; flex-wrap:wrap; gap:.4rem 1.6rem;
+  font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  font-size:clamp(.74rem,2.4vw,.82rem); color:#6e7b91;
+}
+.c421-meta b { font-family:'Saira',sans-serif; font-weight:700; color:#9fd0ff; font-size:1.15em; letter-spacing:.02em; }
+.c421-meta .peak b { color:#ffd28a; }
+
+/* 网格：高度随内容，不拉伸 */
 .grid-block {
   flex:1 1 auto; min-width:0;
   display:grid;
   grid-template-columns:repeat(2, minmax(0, 1fr));
-  grid-template-rows:repeat(2, 1fr);
+  grid-auto-rows:min-content;
   gap:.75rem;
-  align-self:stretch;
+  align-self:flex-start;
 }
 .mini-card {
   background:#11161f; border:1px solid #2a3444; padding:.85rem 1rem 1rem;
   box-shadow:0 0 0 1px rgba(255,255,255,.02),0 6px 18px rgba(0,0,0,.3);
   display:flex; flex-direction:column; align-items:flex-start; gap:.55rem;
-  min-width:0; min-height:0;
-  justify-content:flex-start;
+  min-width:0; justify-content:flex-start;
 }
 .mini-title {
   font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
@@ -97,11 +118,53 @@ body {
   min-height:1.2em;
 }
 
-.article-links {
-  display:flex; flex-direction:column; gap:.45rem; width:100%;
-  margin-top:.15rem;
-  flex:0 0 auto;
+/* 占两列宽的小卡片：一言、音乐 */
+.mini-card.wide {
+  grid-column:span 2;
+  padding:.8rem 1.1rem .9rem;
+  gap:.4rem;
 }
+
+/* 一言内容 */
+.quote-text {
+  font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  font-weight:400; font-size:clamp(.82rem,2.8vw,.95rem);
+  color:#9fd0ff; line-height:1.5; letter-spacing:.02em;
+}
+
+/* 音乐行：曲名 + 播放/暂停按钮 */
+.music-row { display:flex; align-items:center; gap:.7rem; width:100%; }
+.music-title {
+  font-family:'Saira','Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
+  font-weight:700; font-size:clamp(1rem,3.4vw,1.2rem);
+  color:#9fd0ff; letter-spacing:.02em; line-height:1.4;
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* 播放按钮：图标 16×16，碰撞箱 36×36 矩形 */
+.play-btn {
+  position:relative; flex:0 0 auto;
+  width:16px; height:16px;
+  background:none; border:none; padding:0; cursor:pointer;
+  outline:none; -webkit-tap-highlight-color:transparent;
+}
+.play-btn::after {
+  content:''; position:absolute;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  width:36px; height:36px;
+  border-radius:6px;
+  background:transparent;
+}
+.play-btn:hover::after { background:rgba(159,208,255,.10); }
+.play-btn:active::after { background:rgba(159,208,255,.18); }
+.play-btn .icon {
+  display:block; width:16px; height:16px;
+  fill:#9fd0ff; transition:fill .18s;
+  pointer-events:none;
+}
+.play-btn:hover .icon { fill:#d6ecff; }
+
+.article-links { display:flex; flex-direction:column; gap:.45rem; width:100%; margin-top:.15rem; flex:0 0 auto; }
 .article-links a {
   font-family:'Saira','Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
   font-weight:400; font-size:clamp(.82rem,2.8vw,.95rem);
@@ -112,26 +175,27 @@ body {
 }
 .article-links a:hover { color:#d6ecff; border-bottom-color:rgba(159,208,255,.5); }
 
-/* 功能区下方小字注释 */
+/* 底部注释：小分割线位于模块与注释之间 */
 .bottom-caption {
-  position:relative; z-index:1;
-  margin-top:.9rem;
+  position:relative; z-index:1; width:100%;
+  margin-top:2rem;
   font-family:'Microsoft YaHei','微软雅黑','PingFang SC',sans-serif;
-  font-weight:400;
-  font-size:clamp(.62rem,1.8vw,.72rem);
-  color:#5f6c82;
-  letter-spacing:.03em;
-  line-height:1.4;
+  font-weight:400; font-size:clamp(.62rem,1.8vw,.72rem);
+  color:#5f6c82; letter-spacing:.03em; line-height:1.4; text-align:left;
+}
+.bottom-caption::before {
+  content:''; display:block;
+  width:70px; height:1px; margin-bottom:.9rem;
+  background:linear-gradient(90deg,rgba(140,180,240,.3),transparent);
+  opacity:.7;
 }
 
 .hero-spacer { width:100%; height:4.5rem; }
-.hero::after { content:''; display:block; width:70px; height:1px; background:linear-gradient(90deg,rgba(140,180,240,.3),transparent); margin-top:2rem; opacity:.7; }
 
 @media (max-width:900px) {
   .content-row { flex-direction:column; align-items:stretch; }
-  .main-card { width:100%; }
-  .grid-block { width:100%; grid-template-rows:auto auto; align-self:auto; }
-  .mini-card { min-height:auto; }
+  .left-col { width:100%; }
+  .grid-block { width:100%; align-self:stretch; }
 }
 @media (max-width:640px) {
   .hero { padding-left:1rem; padding-right:1rem; }
@@ -139,10 +203,12 @@ body {
   .main-card { padding:1.4rem 1.1rem 1.5rem 1.3rem; }
   .grid-block { gap:.6rem; grid-template-columns:1fr; }
   .mini-card { padding:.7rem .8rem .85rem; }
+  .mini-card.wide { grid-column:span 1; padding:.75rem .85rem .85rem; }
 }
 </style>
 </head>
 <body>
+<div class="bg" aria-hidden="true"></div>
 <main class="hero">
   <div class="header-row">
     <div class="title-block">
@@ -163,26 +229,38 @@ body {
   </div>
 
   <div class="content-row">
-    <section class="main-card" aria-label="日期与属性信息">
-      <div class="date-row">
-        <div class="card-date" id="todayDate">00000000</div>
-        <div class="tz-block">
-          <span class="tz-line1">UTC+8:00</span>
-          <span class="tz-line2" id="tzLine2">—</span>
+    <div class="left-col">
+      <section class="main-card" aria-label="日期与属性信息">
+        <div class="date-row">
+          <div class="card-date" id="todayDate">00000000</div>
+          <div class="tz-block">
+            <span class="tz-line1">UTC+8:00</span>
+            <span class="tz-line2" id="tzLine2">—</span>
+          </div>
         </div>
-      </div>
 
-      <div class="combined-line">
-        <div class="combined-item"><span class="combined-label">标准分解</span><span class="combined-value" id="factorization">—</span></div>
-        <span class="divider">|</span>
-        <div class="combined-item"><span class="combined-value" id="attrLabel">合数</span><span class="combined-joke" id="attrJoke">普通的一天</span></div>
-      </div>
+        <div class="combined-line">
+          <div class="combined-item"><span class="combined-label">标准分解</span><span class="combined-value" id="factorization">—</span></div>
+          <span class="divider">|</span>
+          <div class="combined-item"><span class="combined-value" id="attrLabel">合数</span><span class="combined-joke" id="attrJoke">普通的一天</span></div>
+        </div>
 
-      <div class="future-block">
-        <span class="future-title">后续三个素数天：</span>
-        <ul class="future-list" id="futureList"></ul>
-      </div>
-    </section>
+        <div class="future-block">
+          <span class="future-title">后续三个素数天：</span>
+          <ul class="future-list" id="futureList"></ul>
+        </div>
+      </section>
+
+      <!-- 421 曲线模块：图在上，信息在下 -->
+      <section class="c421-card" aria-label="421 曲线">
+        <svg class="c421-svg" id="c421Svg" viewBox="0 0 520 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="421 曲线，x 轴线性，y 轴对数"></svg>
+        <div class="c421-meta">
+          <span class="start">起始 <b id="c421Start">—</b></span>
+          <span class="peak">峰值 <b id="c421Peak">—</b></span>
+          <span>步数 <b id="c421Steps">—</b></span>
+        </div>
+      </section>
+    </div>
 
     <div class="grid-block" aria-label="功能矩形区">
       <div class="mini-card">
@@ -217,6 +295,24 @@ body {
           <a href="https://osu.ppy.sh/" target="_blank" rel="noopener noreferrer">osu!</a>
         </div>
       </div>
+      <!-- 一言 -->
+      <div class="mini-card wide">
+        <span class="mini-title">一言</span>
+        <div class="quote-text">十年 OI 一场空，不开 long long 见祖宗</div>
+      </div>
+      <!-- 音乐 -->
+      <div class="mini-card wide">
+        <span class="mini-title">音乐</span>
+        <div class="music-row">
+          <span class="music-title">水野健治 - Linked Tune</span>
+          <button class="play-btn" id="bgmBtn" type="button" aria-label="播放" title="播放">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path id="bgmIcon" d="M3.5 1.8 L13 8 L3.5 14.2 Z"/>
+            </svg>
+          </button>
+          <audio id="bgm" src="bgm.mp3" preload="auto"></audio>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -232,12 +328,6 @@ body {
   function todayUTC8(){
     const d=new Date(Date.now()+8*3600*1000);
     return {y:d.getUTCFullYear(),m:d.getUTCMonth()+1,d:d.getUTCDate(),weekday:d.getUTCDay()};
-  }
-  function validDate(y,m,d){
-    if(m<1||m>12||d<1||d>31)return false;
-    const dm=[31,28,31,30,31,30,31,31,30,31,30,31];
-    if((y%4===0&&y%100!==0)||y%400===0)dm[1]=29;
-    return d<=dm[m-1];
   }
   function nextDay(y,m,d){
     const t=new Date(Date.UTC(y,m-1,d)); t.setUTCDate(t.getUTCDate()+1);
@@ -301,7 +391,6 @@ body {
 
   document.getElementById('todayDate').textContent=String(ti);
   document.getElementById('tzLine2').textContent=tzLine2(t);
-
   document.getElementById('factorization').innerHTML=factorize(ti);
 
   const a=attr(ti);
@@ -311,11 +400,10 @@ body {
   const list=document.getElementById('futureList');
   list.innerHTML='';
   let found=0, cy=t.y, cm=t.m, cd=t.d, guard=0;
-  while(found<3&&guard<100000){
+  while(found<3&&guard<1000){
     guard++;
     const ni=nextDay(cy,cm,cd);
     [cy,cm,cd]=splitInt(ni);
-    if(!validDate(cy,cm,cd))continue;
     if(isPrime(ni)){
       found++;
       const li=document.createElement('li');
@@ -328,6 +416,108 @@ body {
     li.className='future-item'; li.textContent='——';
     list.appendChild(li);
   }
+
+  /* ===== 421 曲线 ===== */
+  function collatzSeq(n){
+    const seq=[n];
+    let peak=n, steps=0, guard=0;
+    while(n!==1 && guard<100000){
+      guard++;
+      n = (n%2===1) ? 3*n+1 : n/2;
+      seq.push(n);
+      if(n>peak) peak=n;
+      steps++;
+    }
+    return {seq, peak, steps};
+  }
+
+  function drawCollatz(){
+    const {seq, peak, steps} = collatzSeq(ti);
+
+    document.getElementById('c421Start').textContent = seq[0].toLocaleString();
+    document.getElementById('c421Peak').textContent = peak.toLocaleString();
+    document.getElementById('c421Steps').textContent = steps;
+
+    const svg = document.getElementById('c421Svg');
+    const W=520, H=220, padL=48, padR=16, padT=16, padB=28;
+    const iw = W-padL-padR, ih = H-padT-padB;
+
+    const yMax = Math.log2(Math.max(peak, 2));
+    const xScale = i => padL + (steps===0 ? 0 : (i/steps)*iw);
+    const yScale = v => padT + ih - ((Math.log2(Math.max(v,1)))/yMax)*ih;
+
+    const NS='http://www.w3.org/2000/svg';
+    const el=(tag,attrs)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;};
+
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+    const allK=[];
+    for(let k=0;Math.pow(2,k)<=peak;k++) allK.push(k);
+    const maxTicks=6;
+    const stride=Math.max(1, Math.ceil(allK.length/maxTicks));
+    const shownK=[];
+    for(let i=0;i<allK.length;i+=stride) shownK.push(allK[i]);
+    if(shownK[shownK.length-1]!==allK[allK.length-1]) shownK.push(allK[allK.length-1]);
+
+    shownK.forEach(k=>{
+      const v=Math.pow(2,k), y=yScale(v);
+      svg.appendChild(el('line',{x1:padL,y1:y,x2:W-padR,y2:y,stroke:'#1c2432','stroke-width':1}));
+      const label=v>=1e9?(v/1e9).toFixed(1)+'G':v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(1)+'k':String(v);
+      const txt=el('text',{x:padL-6,y:y+3,'text-anchor':'end',fill:'#5f6c82','font-size':9,'font-family':'Saira,sans-serif'});
+      txt.textContent=label;
+      svg.appendChild(txt);
+    });
+
+    const xStep=Math.max(1, Math.ceil(steps/6));
+    for(let i=0;i<=steps;i+=xStep){
+      const x=xScale(i);
+      svg.appendChild(el('line',{x1:x,y1:padT,x2:x,y2:H-padB,stroke:'#1c2432','stroke-width':1}));
+      const txt=el('text',{x:x,y:H-padB+15,'text-anchor':'middle',fill:'#5f6c82','font-size':9,'font-family':'Saira,sans-serif'});
+      txt.textContent=String(i);
+      svg.appendChild(txt);
+    }
+
+    svg.appendChild(el('line',{x1:padL,y1:padT,x2:padL,y2:H-padB,stroke:'#3a4658','stroke-width':1}));
+    svg.appendChild(el('line',{x1:padL,y1:H-padB,x2:W-padR,y2:H-padB,stroke:'#3a4658','stroke-width':1}));
+
+    let d='';
+    seq.forEach((v,i)=>{
+      d += (i===0?'M':'L') + xScale(i).toFixed(2) + ',' + yScale(v).toFixed(2);
+    });
+    svg.appendChild(el('path',{d,fill:'none',stroke:'#9fd0ff','stroke-width':1.6,'stroke-linejoin':'round','stroke-linecap':'round'}));
+
+    const mark=(v,i,color,r)=>{
+      svg.appendChild(el('circle',{cx:xScale(i),cy:yScale(v),r,fill:color}));
+    };
+    mark(seq[0],0,'#ffffff',2.6);
+    mark(peak,seq.indexOf(peak),'#ffd28a',3);
+    mark(1,seq.length-1,'#7d8aa3',2.4);
+  }
+
+  drawCollatz();
+
+  /* ===== BGM 播放 ===== */
+  const bgm = document.getElementById('bgm');
+  const btn = document.getElementById('bgmBtn');
+  const icon = document.getElementById('bgmIcon');
+  const ICON_PLAY = 'M3.5 1.8 L13 8 L3.5 14.2 Z';
+  const ICON_PAUSE = 'M4 2 H6.5 V14 H4 Z M9.5 2 H12 V14 H9.5 Z';
+
+  function setPlaying(on){
+    icon.setAttribute('d', on ? ICON_PAUSE : ICON_PLAY);
+    btn.setAttribute('aria-label', on ? '暂停' : '播放');
+    btn.setAttribute('title', on ? '暂停' : '播放');
+  }
+
+  btn.addEventListener('click', () => {
+    if (bgm.paused) {
+      bgm.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    } else {
+      bgm.pause();
+      setPlaying(false);
+    }
+  });
+  bgm.addEventListener('ended', () => setPlaying(false)); // 不循环，结束后切回暂停态
 })();
 </script>
 </body>
