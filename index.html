@@ -310,7 +310,7 @@ body {
               <path id="bgmIcon" d="M3.5 1.8 L13 8 L3.5 14.2 Z"/>
             </svg>
           </button>
-          <audio id="bgm" src="bgm.mp3" preload="auto"></audio>
+          <audio id="bgm" src="bgm.mp3" preload="metadata"></audio>
         </div>
       </div>
     </div>
@@ -509,9 +509,27 @@ body {
     btn.setAttribute('title', on ? '暂停' : '播放');
   }
 
-  btn.addEventListener('click', () => {
+  // 路径自检：解析出来的 URL 与预期不一致时提示
+  bgm.addEventListener('loadedmetadata', () => {
+    if (!bgm.currentSrc) console.warn('BGM 未解析到有效地址，请检查 src 相对路径');
+  });
+  bgm.addEventListener('error', () => {
+    console.error('BGM 加载失败：', bgm.currentSrc || bgm.src, bgm.error && bgm.error.code);
+  });
+
+  btn.addEventListener('click', async () => {
     if (bgm.paused) {
-      bgm.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      // 若尚未加载到可播放状态，先主动 load 一次，避免 AbortError
+      if (bgm.readyState < 2) {
+        try { bgm.load(); } catch(e) {}
+      }
+      try {
+        await bgm.play();
+        setPlaying(true);
+      } catch (err) {
+        console.error('播放失败：', err.name, err.message, '当前地址：', bgm.currentSrc || bgm.src);
+        setPlaying(false);
+      }
     } else {
       bgm.pause();
       setPlaying(false);
